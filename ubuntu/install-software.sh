@@ -38,6 +38,9 @@ make inscount2.test TARGET=intel64
 cp /mnt/hgfs/snippet/ctf/re/tracecount.cpp ~/Downloads/pin-3.7-97619-g0d0c92f4f-gcc-linux/source/tools/ManualExamples
 make tracecount.test TARGET=intel64
 
+#https://blog.csdn.net/qq_35859258/article/details/79594009
+root#wget -q -O - https://archive.kali.org/archive-key.asc | apt-key add
+
 #install kali tools https://www.linuxidc.com/Linux/2018-11/155269.htm
 git clone https://github.com/LionSec/katoolin
 https://github.com/rikonaka/katoolin4china
