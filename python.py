@@ -14,6 +14,7 @@ str='''
 "What's your name?," I asked.
 He said "Bond, James Bond."
 ''';
+str = r'\x64'; #r' '
 print('{0} was {1:.3f} years old when he wrote this book'.format(str, 1.0/3))
 print('{0:_^11}'.format('hello'))
 print('{name} wrote {book}'.format(name='Swaroop', book='A Byte of Python'))
@@ -24,10 +25,15 @@ b = '{:08b}'.format(a) # to bin with prefix 0
 
 ''.join(flag) #flag is a char list
 start = line.find('private_bit : 1,')
-m1 = re.search("01/Mar/2015:13:\d{2}:(\d{2})", list[i])
+#https://docs.python.org/3/library/re.html
+s = r'\x64\x6f\x63\x75\x6d\x65\x6e\x74'
+t = re.sub(r'\\x([a-f0-9]{2})', r'\1', s, count=3, flags=re.IGNORECASE) #replace with group, if count omitted or zero, all occurrences will be replaced.
+print t.decode('hex')
+m1 = re.search("01/Mar/2015:13:\d{2}:(\d{2})", list[i]) #match
 t1 = m1.group(1)
 str.lower()
 str.upper()
+bin(x1).count('1') #https://blog.csdn.net/u010005281/article/details/79851154
 
 from Crypto.Util import number
 number.long_to_bytes(0x4342) #CB
@@ -74,6 +80,7 @@ array.reverse() == array[::-1]  #reverse a list or a string
 list1.extend(list2) #append all elements in list2 to list1
 shoplist.sort() #change in list itself
 shoplist.remove('carrot')
+shoplist.pop(0)
 del shoplist[0]
 
 # Lambda
@@ -84,6 +91,7 @@ print(points)
 
 # map apply function to every element in list
 data = list(map(lambda x: list(map(lambda y: int(y, 16), x.split(":"))), open("data").read().splitlines()))
+list3 = map(lambda (a,b):a-b,zip(list1,list2))
 
 #deep copy
 mylist = shoplist[:]    #clone by slicing
@@ -154,6 +162,12 @@ hex(m)[2:].decode('hex')
 
 import math
 math.factorial(3) #3! = 6
+math.sqrt(144) #pow(144, 0.5) = 12
+def comb(n,m): #combination
+  return math.factorial(n)//(math.factorial(n-m)*math.factorial(m))
+  
+def perm(n,m): #permutation
+  return math.factorial(n)//math.factorial(n-m)
 
 ########################################################################
 from Crypto.Cipher import AES
@@ -308,11 +322,13 @@ def retry(f):
         for attempt in range(1, MAX_ATTEMPTS + 1):
             try:
                 return f(*args, **kwargs)
-            except: #catch all
+            except Exception as e: #catch all
                 log.exception("Attempt %s/%s failed : %s",
                                     attempt,
                                     MAX_ATTEMPTS,
                                     (args, kwargs))
+            finally:
+                # do nothing
             sleep(10 * attempt)
         log.critical("All %s attempts failed : %s",
                         MAX_ATTEMPTS,
@@ -329,6 +345,25 @@ def save_to_database(arg):
      raise ValueError(arg)
 if __name__ == '__main__':
     save_to_database("Some bad value")
+
+########################################################################
+'''https://blog.csdn.net/qq_36760780/article/details/80092665
+An = (An-1*Kn) % c
+A0 = a^b0  %  c
+bn = 0 -> Kn = 1; bn=1 -> Kn = Tn
+Tn=( Tn-1 * Tn-1 ) % c
+T0= a % c
+'''
+
+def pow_mod(a, b, c):
+  A = 1
+  T = a % c
+  while b != 0:
+    if b & 1:
+      A = A * T % c
+    b >>= 1
+    T = T * T % c
+  return A
 
 ########################################################################
 class Robot:
@@ -360,4 +395,13 @@ class ChildRobot(Robot):    # inherit
     def __init__(self, sex):
         Robot.__init__(self, name)  # Must call base class constructor
         self.sex = sex
+
+#fibonacci##############################################################
+table = [1, 2]
+a, b = table[0], table[1]
+while True:
+  a, b = b, a+b
+  table.append(b)
+  if b > 463654753678568568:
+    break
 
