@@ -3,6 +3,8 @@
 
 small samples'''
 if __name__ == '__main__':
+  reload(sys)
+  sys.setdefaultencoding('utf-8')
   main()
   
 x += 256 if v_flag else 1 #if True plus 256, else plus 1
@@ -29,6 +31,7 @@ start = line.find('private_bit : 1,')
 s = r'\x64\x6f\x63\x75\x6d\x65\x6e\x74'
 t = re.sub(r'\\x([a-f0-9]{2})', r'\1', s, count=3, flags=re.IGNORECASE) #replace with group, if count omitted or zero, all occurrences will be replaced.
 print t.decode('hex')
+print "\u77ed\u4fe1.\u63d0\u9192".decode('unicode-escape') #python3 NO need to decode
 m1 = re.search("01/Mar/2015:13:\d{2}:(\d{2})", list[i]) #match
 t1 = m1.group(1)
 str.lower()
@@ -39,6 +42,7 @@ from Crypto.Util import number
 number.long_to_bytes(0x4342) #CB
 number.bytes_to_long('hello') #448378203247=0x68656c6c6f
 number.size(0x1234) #print bit length
+print number.getPrime(513) #print random prime with x bit
 for p in number.sieve_base:
   print p #The first 10000 primes
 
@@ -114,6 +118,10 @@ dict1.update(dict2) #update dict1 with dict2 elements, the value for same key in
 del ab['Larry']
 for name, address in ab.items(): #ab.keys()/ab.values()/ab.has_key()
     print('Contact {} at {}'.format(name, address))
+
+def extract_cookies(cookie):
+    cookies = dict([l.strip(' ').split("=", 1) for l in cookie.split(";")])
+    return cookies
 
 #set
 bri = set(['brazil', 'russia', 'india'])
@@ -287,6 +295,7 @@ time.mktime(s.timetuple())
 #https://blog.csdn.net/weixin_42591634/article/details/80883028
 t = time.strptime("15 Sep 2018 17:42:35", "%d %b %Y %H:%M:%S") #localtimezone!!
 time.mktime(t) # time -> epoch_time
+os.makedirs(out_dir)
 for i in sys.path:
     print(i)
 print(os.sep, os.path.exists(os.getcwd()), time.strftime('%Y%m%d%H%M%S', time.gmtime(epoch_time)), os.system('echo hello'), sys.stdout.flush())

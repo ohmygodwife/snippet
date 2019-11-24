@@ -11,6 +11,10 @@ mat_transpose = mat.T # transpose
 result = mat_invert * mat
 result = result.round() # need to call round to convert to integer first
 
+flag = ''
 for i in range(8):
   for j in range(8):
     ch = int(result[i, j])
+    flag += chr(ch)
+
+print flag

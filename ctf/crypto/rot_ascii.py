@@ -27,4 +27,4 @@ def main(ciphertext):
 
 
 if __name__ == '__main__':
-  print main('da]lr{jpgrg_wqclen]peyrgq')
+  print main('PD4~idqQC|WjHloX>)UPb8~ZFb8laGczAeteE')
