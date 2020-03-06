@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # CRC32 tools by Victor
 
-#usage: python crc32.py reverse 0xffffffff(the crc)
+#usage: python crc32.py reverse 0x4b8e39ef(the crc)
 
 import argparse
 import os
@@ -326,6 +326,8 @@ def reverse_callback():
     # 6-byte alphanumeric patches
     for i in permitted_characters:
         for j in permitted_characters:
+#          for k in permitted_characters: #7-byte
+#            patch = [i, j, k]
             patch = [i, j]
             patches = findReverse(desired, calc(patch, accum))
             for last_4_bytes in patches:

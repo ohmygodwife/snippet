@@ -47,3 +47,15 @@ def gen():
   
   if s.check() == sat:
     print s.model()
+    
+''' More than 1 solution, loop to verify! sample: simplecpp-GXYCTF-2019
+x,y,z,l=BitVecs('x y z l',64)
+while s.check() ==sat:
+  m = s.model()
+  print(m)
+#  s.add(m[x]!=x)
+  s.add(m[y]!=y)
+  s.add(m[z]!=z)
+  s.add(m[l]!=l)
+  #verify()
+'''

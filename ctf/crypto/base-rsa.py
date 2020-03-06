@@ -5,6 +5,8 @@ openssl rsa -pubin -in pubkey.pem -text -modulus
 openssl rsa -in privkey.pem -text -modulus
 openssl genrsa -out privkey.pem 1024 #Generating RSA private key, 1024 bit long modulus
 openssl rsautl -decrypt -inkey privkey.pem -in cipher.bin
+openssl x509 -in certificate.der -inform der -text
+openssl x509 -noout -text -in .\public.cer
 # cipher.bin must be convert to HEX first(https://stackoverflow.com/questions/12191045/openssl-rsa-private-decrypt-error0406506clib4func101reason108/12295167)
 '''
 from Crypto import Random

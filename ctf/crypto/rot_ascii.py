@@ -13,6 +13,7 @@ Detail:Ascii移位解密
 def rot(ciphertext):
   plaintext = []
   for i in range(1, 128):
+    plaintext.append(str(i) + ', ')
     for ch in ciphertext:
       v = (ord(ch) + i) & 0x7f
       plaintext.append(chr(v))
@@ -27,4 +28,4 @@ def main(ciphertext):
 
 
 if __name__ == '__main__':
-  print main('PD4~idqQC|WjHloX>)UPb8~ZFb8laGczAeteE')
+  print main('iodj{36g9i2777')

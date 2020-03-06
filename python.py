@@ -26,14 +26,22 @@ x = b'%.4x' % i #to hex with prefix 0
 b = '{:08b}'.format(a) # to bin with prefix 0
 
 ''.join(flag) #flag is a char list
+print(" ".join(str(i) for i in array)) #output with space separator 
+from __future__ import print_function
+for i in range(n):
+  print(i, end='') #continuous output without space and newline
 start = line.find('private_bit : 1,')
 #https://docs.python.org/3/library/re.html
 s = r'\x64\x6f\x63\x75\x6d\x65\x6e\x74'
 t = re.sub(r'\\x([a-f0-9]{2})', r'\1', s, count=3, flags=re.IGNORECASE) #replace with group, if count omitted or zero, all occurrences will be replaced.
 print t.decode('hex')
 print "\u77ed\u4fe1.\u63d0\u9192".decode('unicode-escape') #python3 NO need to decode
+r=re.compile(r"\w+")
+r.search('123')
 m1 = re.search("01/Mar/2015:13:\d{2}:(\d{2})", list[i]) #match
 t1 = m1.group(1)
+pattern = re.compile(r'\d+')
+array = pattern.findall(test)
 str.lower()
 str.upper()
 bin(x1).count('1') #https://blog.csdn.net/u010005281/article/details/79851154
@@ -66,8 +74,19 @@ EnBase32 = "weNTDk5LZsNRHk6cVogqTZmFy2NRP7X4ZHLTBZwg".translate(table)
 
 if all([c in string.printable for c in str]): #all element satisfy
 
+#https://www.jianshu.com/p/24dd4e194a97
 for i in (N,e,c):
   print list(collections.Counter(i)) #statistic char count
+list(c)  # list of key
+set(c)  # set of key
+dict(c)  # [key,value] to dict
+c.items()  # list of [key,value]
+c & d  # min(c[x], d[x])
+c | d  # max(c[x], d[x])
+most = counter.most_common(n) #top n items, list all when n is null
+''.join(c[0] for c in most) #top n key
+most.sort(key = lambda item:item[-1],reverse = True)
+most.sort(key = lambda item:item[0])
 
 print libnum.n2s(flag) #int to string
 print libnum.b2s(flag) #bin to string
@@ -193,13 +212,16 @@ print cipher.decrypt(msg).encode('hex')
 import zlib
 crc = zlib.zrc32('IEND') & 0xffffffff
 
+import binascii
+crc = binascii.crc32('xxx') & 0xffffffff
+
 import bubblepy
 bubblepy.BubbleBabble().decode('xevek_duvyk_hunuf_gesuf_dotyf_besif_fusif_nemyk_hexix')
 
 import quopri #quoted-printable
 quopri.decodestring('=E5=80=BC=E5=B0=B1')
 
-########################################################################
+########################################################################https://2.python-requests.org/en/master/api/#main-interface
 import requests
 r = requests.get(url, cookies={'PHPSESSID': 'abcde'})
 r = requests.post(url=url,data=data)
@@ -218,6 +240,9 @@ print(reqpost.text)
 print(reqpost.headers)
 print(reqpost.content)
 
+files = {'uploaded': ('123.jpg', "<script language=\"php\">echo file_get_contents(\"/flag\");</script>", 'image/jpeg')} #3-tuple ('filename', fileobj, 'content_type')
+res = requests.post(url, files = files)
+
 import socket #For windows
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect(('210.32.4.14', 13373))
@@ -226,6 +251,8 @@ s.send(ans)
 
 ########################################################################
 import itertools
+x = itertools.cycle('abc')
+next(x) #a, b, c, a, b, c, ...
 fuzzing = "abcdefghijklmnopqrstuvwxyz0123456789QWERTYUIOPASDFGHJKLZXCVBNM"
 fuzz = itertools.permutations(string.printable, 5)
 string.ascii_letters/string.ascii_lowercase/string.ascii_uppercase/string.digits(0-9)/string.hexdigits(0-9,a-f,A-F)/string.letters(lowercase,uppercase)/string.octdigits(0-7)/string.punctuation
@@ -281,6 +308,16 @@ def get_array_from_ida(raw, byte_length): #shift+E extract byte array, then conv
 matrix_target = get_array_from_ida(matrix_target_raw, 4)
 
 ########################################################################
+import argparse
+def parse_args():
+  parser = argparse.ArgumentParser(description='divide a .xlsx file by date')
+  parser.add_argument("target", help="target crc32 value, in dec or hex", type=str) # fix arg
+  parser.add_argument("-l", "--length", help="source length", type=int, default="2") #optional arg, name start with '-'
+  args = parser.parse_args()
+  print args
+  print("parameter a is :",args.target)
+  print("parameter b is :",args.length)
+
 import getopt
 try:
   opts, args = getopt.getopt(sys.argv[1:], "hle:t:p:cu:", ["help", "listen", "execute", "target", "port", "command", "upload"])
@@ -290,15 +327,27 @@ except getopt.getoptError as err:
 import sys
 import os
 import time
+#Lib\site-packages\future\backports\datetime.py
+s = datetime.date.today() - datetime.timedelta(days=1)
+format(s, '%Y%m%d') #date
 s = datetime.datetime(2018,9,15,9,42,35)
 time.mktime(s.timetuple())
 #https://blog.csdn.net/weixin_42591634/article/details/80883028
 t = time.strptime("15 Sep 2018 17:42:35", "%d %b %Y %H:%M:%S") #localtimezone!!
 time.mktime(t) # time -> epoch_time
 os.makedirs(out_dir)
+shutil.rmtree(path, ignore_errors=True) #If ignore_errors is true, errors resulting from failed removals will be ignored; if false or omitted, such errors are handled by calling a handler specified by onerror or, if that is omitted, they raise an exception.
+shutil.copy(source, target) #copy file
 for i in sys.path:
     print(i)
 print(os.sep, os.path.exists(os.getcwd()), time.strftime('%Y%m%d%H%M%S', time.gmtime(epoch_time)), os.system('echo hello'), sys.stdout.flush())
+
+threeDayAgo = (datetime.datetime.now() - datetime.timedelta(days = 3))
+
+start = timeit.default_timer()
+fun()
+end = timeit.default_timer()
+print str(end-start)
 
 import platform
 import logging
@@ -311,7 +360,7 @@ else:
 print("Logging to", logging_file)
 logging.basicConfig(
     level=logging.DEBUG,
-    format='%(asctime)s : %(levelname)s : %(message)s',
+    format='%(asctime)s %(filename)s-%(lineno)s [%(levelname)s]: %(message)s',
     filename=logging_file,
     filemode='w',
 )

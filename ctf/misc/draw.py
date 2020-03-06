@@ -19,6 +19,23 @@ plt.plot(x, y, 'r-o') #draw points and line. - for line, o for point, * for star
 plt.plot(t, t, 'r--', t, t**2, 'bs', t, t**3, 'g^')
 plt.show()
 
+#forward,backward,turn left/right, car:redhat-2019,https://www.cnblogs.com/basstorm/p/11885798.html
+import turtle
+
+turtle.left(90)
+for i in range(len(A)):
+  if En[i] == 1:
+    if A[i] == 1 and B[i] == 1:
+      turtle.forward(5)
+    if A[i] == 0 and B[i] == 0:
+      turtle.backward(5)
+    if A[i] == 1 and B[i] == 0:
+      turtle.right(90)
+    if A[i] == 0 and B[i] == 1:
+      turtle.left(90)
+
+turtle.mainloop()
+
 #rgb
 x = 887 
 y = 111 
