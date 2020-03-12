@@ -42,7 +42,7 @@ def one_by_one():
     #10 = Treat the image as a single character.
     ch = pytesseract.image_to_string(out_im, lang='eng', config='--psm 10')
     print(ch)
-    ch = pytesseract.image_to_string(out_im, lang='mogu', config='--psm 10')
+    ch = pytesseract.image_to_string(out_im, lang='mogu', config='--psm 10 --tessdata-dir train')
     print(ch)
     start_map[start_x] = ch[:1]
   code = ''.join([item[1] for item in sorted(start_map.items(), key=lambda i:i[0])])

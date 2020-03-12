@@ -36,4 +36,4 @@ ren shapetable %lang%.shapetable
 REM generate traineddata
 combine_tessdata %lang%
 
-REM if not move traineddata, need to specify –tessdata-dir when calling tesseract
+REM if not move traineddata, need to specify "--tessdata-dir" when calling tesseract
