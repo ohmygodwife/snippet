@@ -1,3 +1,4 @@
+# re_find_plut0, 210813inctf
 import angr
 import claripy
 import sys
@@ -10,7 +11,9 @@ import logging
 #logging.basicConfig()
 #logging.getLogger('angr.manager').setLevel(logging.DEBUG)
 
-proj = angr.Project("./martricks", load_options={'auto_load_libs': False})
+proj = angr.Project("./re_find_plut0", load_options={'auto_load_libs': False})
+
+base = 0x400000
 
 def add_cond(state, argv1):
   for byte in argv1.chop(8):
@@ -29,7 +32,7 @@ def argv(): #variable passed by argv
   simgr = proj.factory.simgr(state)
   simgr.explore(find=0x400A84, avoid=[0x400A90])
 #  simgr.explore(find=lambda s:"correct!" in s.posix.dumps(1))
-  print simgr.one_found.solver.eval(argv1, cast_to=str)
+  print(simgr.one_found.solver.eval(argv1, cast_to=str))
 
 def hook(): #variable passed by hooked scanf
   flag = claripy.BVS("flag",100*8)
@@ -44,33 +47,33 @@ def hook(): #variable passed by hooked scanf
   simgr = proj.factory.simgr(state)
   simgr.explore(find=0x400A84, avoid=[0x400A90])
   simgr.explore(find=lambda s:"correct!" in s.posix.dumps(1))
-  print simgr.one_found.solver.eval(flag, cast_to = str)
+  print(simgr.one_found.solver.eval(flag, cast_to = str))
 
 def stdin(): #variable passed by stdin
   passwd_len = int(sys.argv[1])
   
   #with unicorn 54sec, without 58sec
-  state = proj.factory.entry_state(add_options=angr.options.unicorn)
+#  state = proj.factory.entry_state(add_options=angr.options.unicorn)
   
-  # Constrain the first x bytes to be non-null and non-newline:
-  for _ in xrange(passwd_len):
-    k = state.posix.files[0].read_from(1) #files[0] for stdin
-    state.se.add(k >= 0x20)
-    state.se.add(k < 0x7f)
-
-  # Constrain the last byte to be a newline
-  k = state.posix.files[0].read_from(1)
-  state.se.add(k == 10)
-
-  # Reset the symbolic stdin's properties and set its length.
-  state.posix.files[0].seek(0)
-  state.posix.files[0].length = passwd_len + 1
+  flag_chars = [claripy.BVS('flag_%d' % i, 8) for i in range(passwd_len)]
+  flag = claripy.Concat(*flag_chars + [claripy.BVV(b'\n')])
+  
+  state = proj.factory.full_init_state(
+        args=[],
+        add_options=angr.options.unicorn,
+        stdin=flag,
+    )
+    
+  # Constrain the first 28 bytes to be non-null and non-newline:
+  for k in flag_chars:
+    state.solver.add(k >= 0x20)
+    state.solver.add(k < 0x7f)
   
   simgr = proj.factory.simgr(state)
 #  simgr.explore(find=lambda s:"correct!" in s.posix.dumps(1))
-  simgr.explore(find=0x400A84, avoid=[0x400A90])
-  print simgr.one_found.posix.dumps(0)
-  print simgr.one_found.posix.dumps(1)
+  simgr.explore(find=base + 0xadb, avoid=[base + 0x8aa])
+  print(simgr.one_found.posix.dumps(0))
+  print(simgr.one_found.posix.dumps(1))
 
 def test():
     assert stdin() == 'ais3{I_tak3_g00d_n0t3s}'

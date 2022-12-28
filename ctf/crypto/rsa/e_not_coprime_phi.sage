@@ -1,4 +1,4 @@
-'''http://www.soreatu.com/ctf/writeups/Writeup%20for%20Crypto%20problems%20in%20NCTF%202019.html'''
+'''https://blog.soreatu.com/posts/intended-solution-to-crypto-problems-in-nctf-2019'''
 import random
 import time
 
@@ -102,6 +102,7 @@ for mpp in mps:
         solution = CRT_list([int(mpp), int(mqq)], [p, q])
         if check(solution):
             print(solution)
+            exit()
     print(time.time() - start)
             
 end = time.time()

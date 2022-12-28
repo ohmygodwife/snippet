@@ -24,6 +24,9 @@ print(r"Newlines are indicated by \n") #Raw string
 print "%#x => %s" % (address, (data or '').encode('hex'))
 x = b'%.4x' % i #to hex with prefix 0
 b = '{:08b}'.format(a) # to bin with prefix 0
+'ssss'.ljust(10, 'b') #ssssbbbbbb
+'ssss'.rjust(10, 'b') #bbbbbbssss
+'ssss'.zfill(10) #000000ssss = rjust
 
 ''.join(flag) #flag is a char list
 print(" ".join(str(i) for i in array)) #output with space separator 
@@ -34,6 +37,7 @@ start = line.find('private_bit : 1,')
 #https://docs.python.org/3/library/re.html
 s = r'\x64\x6f\x63\x75\x6d\x65\x6e\x74'
 t = re.sub(r'\\x([a-f0-9]{2})', r'\1', s, count=3, flags=re.IGNORECASE) #replace with group, if count omitted or zero, all occurrences will be replaced.
+line.replace(r'\.', '')
 print t.decode('hex')
 print "\u77ed\u4fe1.\u63d0\u9192".decode('unicode-escape') #python3 NO need to decode
 r=re.compile(r"\w+")
@@ -42,8 +46,8 @@ m1 = re.search("01/Mar/2015:13:\d{2}:(\d{2})", list[i]) #match
 t1 = m1.group(1)
 pattern = re.compile(r'\d+')
 array = pattern.findall(test)
-str.lower()
-str.upper()
+str.lower() islower()
+str.upper() isupper()
 bin(x1).count('1') #https://blog.csdn.net/u010005281/article/details/79851154
 
 from Crypto.Util import number
@@ -68,6 +72,15 @@ def rot13(message):
   trance = 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm'
   return message.translate(string.maketrans(first, trance)) 
 
+Crypto.Util.strxor.strxor((2*sol_md5.encode())[:len(flag)], flag)
+def str_xor(s: str, k: str):
+    k = (k * (len(s) // len(k) + 1))[0:len(s)]
+    return ''.join(chr(a ^ b) for a, b in zip(s, k)) #ord(a) ^ ord(b) for python2
+
+base64.b85decode(s) #RFC1924 python3
+base64.a85decode(s) #ASCII85
+base58.b58decode(s)
+base64.b64encode(s)
 table = string.maketrans("NoPqRsTuVwXyZaBcDeFgHiJkLm567234", "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567") #base32
 table = string.maketrans("BACDEFGHIJSTUVWKLMNOPQRXYZabcdqrstuvwxefghijklmnopyz0123456789+/", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/") #base64
 EnBase32 = "weNTDk5LZsNRHk6cVogqTZmFy2NRP7X4ZHLTBZwg".translate(table)
@@ -90,6 +103,9 @@ most.sort(key = lambda item:item[0])
 
 print libnum.n2s(flag) #int to string
 print libnum.b2s(flag) #bin to string
+
+enc_str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz_{}'
+dec_dic = {k:v for v,k in enumerate(enc_str)}
 
 ########################################################################
 #list: Mutable []
@@ -126,16 +142,22 @@ a = [1,2,3]
 b = [4,5,6]
 zipped = zip(a,b) #[(1, 4), (2, 5), (3, 6)]
 
-#tuple: Immutable ()
+reduce(lambda x, y: x+y, [1,2,3,4,5]) # apply x+y to (1,2), then to the result and 3, so it is calculating the sum here
+
+#tuple: Immutable (), variable-length argument
 zoo = ('python', 'elephant', 'penguin')
 zooList = list(zoo) #tuple to list
+
+def f1(arg1, arg2, *arg):
+    print arg #(3,4,5)
+f1(1,2,3,4,5)
 
 #dict {}
 ab = {'Swaroop': 'swaroop@swaroopch.com',
 'Larry': 'larry@wall.org'} #dict
 dict1.update(dict2) #update dict1 with dict2 elements, the value for same key in dict1 would be replaced.
 del ab['Larry']
-for name, address in ab.items(): #ab.keys()/ab.values()/ab.has_key()
+for name, address in ab.items(): #ab.keys()/ab.values()/ab.has_key('k1')
     print('Contact {} at {}'.format(name, address))
 
 def extract_cookies(cookie):
@@ -144,12 +166,21 @@ def extract_cookies(cookie):
 
 #set
 bri = set(['brazil', 'russia', 'india'])
-print('india' in bri)
+print('india' in bri) #check contains key
 bric = bri.copy()
 bric.add('china')
 print(bric.issuperset(bri))
 bri.remove('russia')
 print(bri & bric)
+
+#heapq, https://www.cnblogs.com/ZhangYidada/p/6381345.html
+class Node:
+  def __lt__(self, other): # for heapq, not used here!
+    return self.distance < other.distance
+heapq.heappush(heap, start_node)
+top = heapq.heappop(heap)
+heapq.heapify(list)
+heapq.nsmallest(n, list, key=lambda s: s['price'])
 
 ########################################################################
 # default open file with 'r'(read) and 't'(text)
@@ -171,10 +202,23 @@ storedlist = pickle.load(f) #Load the object from the file
 f = io.open("abc.txt", "wt", encoding="utf-8")
 text = io.open("abc.txt", encoding="utf-8").read()
 
+#zip file
+f = zipfile.ZipFile('misc_UNZIP.zip', 'r')
+for name in f.namelist():
+    print(name)
+zfile = zipfile.ZipFile('a.zip')
+zfile.extractall(members=zfile.namelist())
+zfile.close()
+ZipFile.infolist()
+
 ########################################################################
 def ror(v, n):
   low = v & ((1<<n) - 1)
   return (low << (32-n)) | (v >> n)
+  
+def rol(v, n):
+  low = v & ((1 << (32 - n)) - 1)
+  return (low << n) | (v >> (32 - n))
 
 n.bit_length() #print bit length of n
 if abs(sumdic[key] - x) < 0.00000000000001: #float
@@ -190,17 +234,21 @@ hex(m)[2:].decode('hex')
 import math
 math.factorial(3) #3! = 6
 math.sqrt(144) #pow(144, 0.5) = 12
+math.log(100, 10)#log_10 100 = 2
 def comb(n,m): #combination
   return math.factorial(n)//(math.factorial(n-m)*math.factorial(m))
   
 def perm(n,m): #permutation
   return math.factorial(n)//math.factorial(n-m)
 
+#quadratic residue
+gmpy2.jacobi(two_inv * ct, N)
 ########################################################################
 from Crypto.Cipher import AES
 
 key = '61323764353962643238316365623464'.decode('hex') #'a27d59bd281ceb4d'
 iv = '00000000000000000000000000000000'.decode('hex')
+#NOTICE: CBC mode would save local state, it must be a new one before next decrypt!!!
 cipher = AES.new(key, AES.MODE_CBC, iv) #AES.MODE_ECB
 
 msg = '36CA216395933344049B6A1CBE9E28851BEDF4986CEDEE09F01FD4777527567251489188A0D4A3412E1AA0F2EF2B3EB6'.decode('hex')
@@ -211,6 +259,7 @@ print cipher.decrypt(msg).encode('hex')
 
 import zlib
 crc = zlib.zrc32('IEND') & 0xffffffff
+zlib.decompress(buf)
 
 import binascii
 crc = binascii.crc32('xxx') & 0xffffffff
@@ -218,8 +267,16 @@ crc = binascii.crc32('xxx') & 0xffffffff
 import bubblepy
 bubblepy.BubbleBabble().decode('xevek_duvyk_hunuf_gesuf_dotyf_besif_fusif_nemyk_hexix')
 
+s = uu.decode('uuencode.txt') #uuencode, ascii from 32 - 95, NOT lower case
+
 import quopri #quoted-printable
 quopri.decodestring('=E5=80=BC=E5=B0=B1')
+
+#https://www.cnpython.com/pypi/sm4
+from sm4 import SM4Key
+key0=SM4Key("546869736973696e7374657265737468".decode('hex'))
+c=key0.encrypt("DoyouKnowVEHSEH!")
+m=key0.decrypt("5870990c4f3b099078d6079ce93817b3".decode('hex'), initial='\0'*16, padding=True) #default is ecb, pass initial to enable cbc
 
 ########################################################################https://2.python-requests.org/en/master/api/#main-interface
 import requests
@@ -234,8 +291,9 @@ headers = {
     'User-Agent': 'Mozilla/5.0',
     'Cookie':'x=1'
 }
+proxies = { "http": "http://10.10.1.10:3128", "https": "http://10.10.1.10:1080"}
 payload = {key1:'value1', key2:'value2'}
-reqpost = requests.post("www.xxx.com", data=payload, headers=headers)
+reqpost = requests.post("www.xxx.com", data=payload, headers=headers, proxies=proxies, verify=False)
 print(reqpost.text)
 print(reqpost.headers)
 print(reqpost.content)
@@ -278,6 +336,9 @@ possibilities = tuple(itertools.product(*possible_values))
 for guess in progressbar.ProgressBar(widgets=[progressbar.Counter(), ' ', progressbar.Percentage(), ' ', progressbar.Bar(), ' ', progressbar.ETA()])(possibilities):
         stdout,_ = subprocess.Popen(["./whitehat_crypto400", ''.join(guess)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()
 
+from tqdm import tqdm
+for k in tqdm(range(1, 1001)):
+
 import subprocess
 def run(cmd):
   p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
@@ -285,6 +346,11 @@ def run(cmd):
   return stdoutdata
 
 subprocess.check_output('tesseract 1.jpg 1', shell=True)
+
+from pwn import *
+p = process("./re", cwd = "/home/pandaos/Desktop/fuck/f%d/" % n)
+p.sendline(''.join(guess))
+
 #matrix#################################################################
 from numpy import *
 temp = array(temp)
@@ -296,9 +362,10 @@ print public_key.T #transpose转置矩阵
 print public_key.I #invert逆矩阵
 [[ 1. -1.]
  [-2.  3.]]
+result = result.round() # need to call round to convert to integer first
 for i in range(8):
   for j in range(8):
-    ch = int(public_key[i, j] + 0.5)
+    ch = int(result[i, j])
 
 def get_array_from_ida(raw, byte_length): #shift+E extract byte array, then convert to int array
   array = []
@@ -345,8 +412,19 @@ shutil.rmtree(path, ignore_errors=True) #If ignore_errors is true, errors result
 shutil.copy(source, target) #copy file
 for i in sys.path:
     print(i)
+sys.path.append('/mnt/hgfs/tools/crypto/rsa/crypto-attacks') #import personal module
 print(os.sep, os.path.exists(os.getcwd()), time.strftime('%Y%m%d%H%M%S', time.gmtime(epoch_time)), os.system('echo hello'), sys.stdout.flush())
 os.chdir('/')
+os.path.dirname(os.path.abspath(__file__)) #dirname of current file
+os.path.realpath() #real path, not symbolic link
+os.path.getsize('/tmp/abc')
+#move file
+shutil.move(curfile, "../out")
+#list file
+for root, dirs, files in os.walk(r"Files"):
+    for file in files:
+        print root
+        print os.path.join(root, file)
 
 threeDayAgo = (datetime.datetime.now() - datetime.timedelta(days = 3))
 
@@ -469,3 +547,25 @@ while True:
   if b > 463654753678568568:
     break
 
+import pandas as pd
+pd.set_option("display.unicode.east_asian_width", True)
+s = pd.Series(data=[1,2,3], index)
+df = pd.DataFrame(data=[[1,2], [3,4]], index, columns) #data, 2-D array
+df = pd.DataFrame(dict)
+df = pd.read_excel(path, sheet_name=1, header=None, na_values=['--', 'na', 'n/a'])
+df = pd.read_csv(path, sep, header, encoding)
+df.to_excel(path, index=True, sheet_name=[])
+df.to_csv(path, sep, float_format='%.2f', columns=None, header=True, index=True)
+df.loc[index, column]
+df.loc[:, column] = [] #modify column
+df.iloc[0,1]
+df['column'] = [1,2,3] # add by column
+df['new_row'] = [1,2,3] #pd.Series([1,2,3])
+df.isnull()
+df.rename(columns={'old':'new'},inplace=True)
+df.drop(index='', columns='', inplace=True)
+df=df.dropna() #fillna()
+df = df[df['column'].notnull()] # drop column=null row
+df['column'] = df['column'].fillna(new_value)
+df.duplicated()
+df.drop_duplicates(keep='first', subset=[column1,column2], inplace=True)

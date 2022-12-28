@@ -25,14 +25,15 @@ def partial(c,n):
     upper = decimal.Decimal(n)
     for i in range(k):
         possible_plaintext = (lower + upper)/2
+        c=(c*c_of_2) % n     # multiply y by the encryption of 2 again
         lsb = oracle(c)
         if not lsb: #lsb is 0
             upper = possible_plaintext            # plaintext is in the lower half
         else:
             lower = possible_plaintext            # plaintext is in the upper half
-        c=(c*c_of_2) % n     # multiply y by the encryption of 2 again
+        
         print i, lsb, int(upper - lower)
     # By now, our plaintext is revealed!
     return int(upper)
 print "[*] Conducting Oracle attack..."
-print repr(libnum.n2s(partial((c*c_of_2)%n,n)))
+print repr(libnum.n2s(partial(c,n)))

@@ -12,12 +12,17 @@ from PIL import Image
 #point
 x = [11422,11360,11312,11274,11233,11196,11160,11129,11098,11038]
 y = [123,120,115,110,105,100,95,90,85,80]
+#x,y = np.loadtxt('diff00.txt', delimiter=' ', unpack=True)
 
 #plt.scatter(x, y) #draw points
 plt.plot(x, y, 'r-o') #draw points and line. - for line, o for point, * for star
 # red dashes, blue squares and green triangles
 plt.plot(t, t, 'r--', t, t**2, 'bs', t, t**3, 'g^')
 plt.show()
+
+im = plt.imread('path')
+im = im[30:200, 60:180] # cut
+plt.imshow(im)
 
 #forward,backward,turn left/right, car:redhat-2019,https://www.cnblogs.com/basstorm/p/11885798.html
 import turtle
@@ -70,3 +75,4 @@ for i in range(im.height):
     for k in range(3): #RGB
       print seq[i * im.height + j][k]
 #im.convert("1") #
+im.resize((x,y))

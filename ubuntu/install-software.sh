@@ -46,7 +46,67 @@ git clone https://github.com/LionSec/katoolin
 https://github.com/rikonaka/katoolin4china
 
 #TODO install sage http://www.sagemath.org/download-linux.html
+#https://wiki.sagemath.org/Python3-Switch
+make configure
+./configure --with-python=2
+make build
+sage -i openssl
+sage -f python2 (takes hours)
 
+#install mysql
+sudo apt install mysql-server, reboot to make mysql work
+mysql -u root -p
+>use mysql;
+>update user set host='%' where user='root';
+sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf, comment out line: bind-address = 127.0.0.1
+sudo service mysql restart
+
+#install open-jdk
+sudo apt-get install openjdk-8-jdk
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+#install ssh
+sudo apt-get install openssh-server
+#add ssh pub to authorized_keys to make ssh login without password
+ssh-keygen -t rsa -P "" -f ~/.ssh/id_rsa
+cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
+
+#hadoop, https://blog.csdn.net/qq_27046703/article/details/93348674
+#etc/hadoop/hadoop-env.sh add JAVA_HOME
+#core-site.xml
+<configuration>
+    <property>
+        <name>fs.defaultFS</name>
+        <!--MUST be hostname or IP, otherwise, namenode could NOT work fine, https://stackoverflow.com/questions/57670303/there-are-1-datanodes-running-and-1-nodes-are-excluded-in-this-operation-p -->
+        <value>hdfs://192.168.75.130:9000</value>
+    </property>
+    <property>
+        <name>hadoop.tmp.dir</name>
+        <value>file:/home/tt/software/hadoop-3.2.1/tmp</value>
+    </property>
+</configuration>
+#hdfs-site.xml
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+    </property>
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>file:/home/tt/software/hadoop-3.2.1/dfs/name</value>
+    </property>
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>file:/home/tt/software/hadoop-3.2.1/dfs/data</value>
+    </property>
+<!--    <property>
+      <name>dfs.namenode.rpc-address</name>
+      <value>192.168.75.130:9000</value>
+    </property>-->
+</configuration>
+#format
+bin/hdfs namenode -format
+#start dfs
+sbin/start-dfs.sh
 
 
 

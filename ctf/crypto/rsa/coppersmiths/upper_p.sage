@@ -11,11 +11,11 @@ epsilon = beta^2/7
 pbits = p.nbits()
 kbits = floor(n.nbits()*(beta^2-epsilon))
 pbar = p & (2^pbits-2^kbits)
-print "upper %d bits (of %d bits) is given" % (pbits-kbits, pbits)
+print("upper %d bits (of %d bits) is given" % (pbits-kbits, pbits))
 
 PR.<x> = PolynomialRing(Zmod(n))
 f = x + pbar
 
-print p
+print(p)
 x0 = f.small_roots(X=2^kbits, beta=0.3)[0]  # find root < 2^kbits with factor >= n^0.3
-print x0 + pbar
+print(x0 + pbar)

@@ -1,6 +1,13 @@
 #coding=utf8
 from pwn import *
 from LibcSearcher import *
+#https://blog.csdn.net/v_xchen_v/article/details/80393967
+import sys
+lib_dir = '/mnt/hgfs/snippet/ctf/pwn' #to import personal py, for instance file.py
+import sys
+sys.path.append('/mnt/hgfs/tools/crypto/rsa/crypto-attacks')
+if lib_dir not in sys.path:
+  sys.path.append(lib_dir)
 from FILE import *
 context.log_level = 'debug'
 
@@ -190,4 +197,5 @@ def exp():
   p.interactive()
   
 if __name__ == '__main__':
+  p.recvall()
   exp()

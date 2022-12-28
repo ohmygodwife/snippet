@@ -13,16 +13,17 @@ for a in dic:
     for b in dic:
         pp = hex(p) + a + b
         pp += '0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
-        pp = int(pp, 16)
-        p_fake = pp+0x10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+#       pp = int(pp, 16)
+#        p_fake = pp+0x10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
         pbits = 1024
         kbits = pbits-576
-        pbar = p_fake & (2^pbits-2^kbits)
-        print "upper %d bits (of %d bits) is given" % (pbits-kbits, pbits)
+#        pbar = p_fake & (2^pbits-2^kbits)
+        pbar = int(pp, 16)
+#        print "upper %d bits (of %d bits) is given" % (pbits-kbits, pbits)
         PR.<x> = PolynomialRing(Zmod(n))
         f = x + pbar
         try:
             x0 = f.small_roots(X=2^kbits, beta=0.4)[0]  # find root < 2^kbits with factor >= n^0.4
-            print x0 + pbar
+            print(x0 + pbar)
         except:
             pass

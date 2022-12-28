@@ -1,4 +1,5 @@
-'''http://www.soreatu.com/ctf/writeups/Writeup%20for%20Crypto%20problems%20in%20NCTF%202019.html'''
+#babyRSA, NCTF-2019, https://blog.soreatu.com/posts/intended-solution-to-crypto-problems-in-nctf-2019/
+
 from Crypto.Util.number import *
 import gmpy2
 

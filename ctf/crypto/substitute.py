@@ -32,4 +32,4 @@ def main(ciphertext, src, dst):
 
 
 if __name__ == '__main__':
-  print main('1adcab2', 'abcd', 'efgh')
+  print main('kiqlwtfcqgnsoo', 'qwertyuiopasdfghjklzxcvbnm', 'abcdefghijklmnopqrstuvwxyz') #qwe->abc

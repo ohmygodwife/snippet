@@ -3,7 +3,7 @@ from LibcSearcher import *
 #context.log_level = 'debug'
 
 if args['REMOTE']:
-    sh = remote('111', 111)
+    sh = remote('127.0.0.1', 9999)
 else:
     sh = process('./contacts')
 

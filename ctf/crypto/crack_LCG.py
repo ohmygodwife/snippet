@@ -1,5 +1,5 @@
 '''
-http://www.soreatu.com/ctf/writeups/Writeup%20for%20Crypto%20problems%20in%20NCTF%202019.html
+http://www.soreatu.com/posts/intended-solution-to-crypto-problems-in-nctf-2019
 https://zeroyu.xyz/2018/11/02/Cracking-LCG/
 '''
 # python2
@@ -127,3 +127,24 @@ challenge3()
 challenge4()
 
 r.interactive()
+
+'''
+import gmpy2
+
+def crack_unknown_increment(states, modulus, multiplier):
+    increment = (states[1] - states[0]*multiplier) % modulus
+    return modulus, multiplier, increment
+
+def crack_unknown_multiplier(states, modulus):
+    multiplier = (states[2] - states[1]) * gmpy2.invert(states[1] - states[0], modulus) % modulus
+    return crack_unknown_increment(states, modulus, multiplier)
+
+def crack_unknown_modulus(states):
+    diffs = [s1 - s0 for s0, s1 in zip(states, states[1:])]
+    zeroes = [t2*t0 - t1*t1 for t0, t1, t2 in zip(diffs, diffs[1:], diffs[2:])]
+    modulus = abs(reduce(gmpy2.gcd, zeroes))
+    return crack_unknown_multiplier(states, modulus)
+
+print crack_unknown_modulus([2818206783446335158, 3026581076925130250,
+    136214319011561377, 359019108775045580, 2386075359657550866, 1705259547463444505])
+'''

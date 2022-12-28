@@ -1,6 +1,48 @@
-from z3 import *
+#numpy is beter than z3
+import numpy as np
+coefficient = [2, 3, 3, 4]
+result = [18, 25]
+len1 = len(coefficient)
+len2 = len(result)
+
+#https://numpy.org/devdocs/reference/generated/numpy.linalg.solve.html
+def doNpLinalg():
+  arr1 = np.array(coefficient)
+  arr1 = arr1.reshape(len2, len1/len2)
+  arr2 = np.array(result)
+  x = np.linalg.solve(arr1,arr2)
+  print x
+  x = x.round()
+  flag = ''
+  for i in x:
+    ch = int(i)
+    flag += chr(ch)
+  print flag
+
+doNpLinalg()
+
+def doNpMatrix():
+  arr1 = np.array(coefficient)
+  arr1 = arr1.reshape(len2, len1/len2)
+  mat1 = np.matrix(arr1)
+
+  arr2 = np.array(result)
+  arr2 = arr2.reshape(len2, 1) #arr2.reshape(-1, 1)
+  mat2 = np.matrix(arr2)
+
+  mat3 = mat1.I * mat2
+  mat3 = mat3.round()
+  print mat3
+  flag = ''
+  for i in range(len1/len2):
+    ch = int(mat3[i, 0])
+    flag += chr(ch)
+  print flag
+
+doNpMatrix()
 
 def doZ3():
+  from z3 import *
   s = Solver()
   v1,v2,v3,v4,v5,v6,v7,v8 = Ints('v1 v2 v3 v4 v5 v6 v7 v8')
   s.add(331 * v7 + 317 * v6 + 313 * v5 + 311 * v4 + 307 * v3 + 293 * v2 + 283 * v1 + 337 * v8 - 225643 == 0)
